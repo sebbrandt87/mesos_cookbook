@@ -59,10 +59,13 @@ template 'mesos-slave-wrapper' do
   group 'root'
   mode '0750'
   source 'wrapper.erb'
-  variables(env:    node['mesos']['slave']['env'],
-            bin:    node['mesos']['slave']['bin'],
-            flags:  node['mesos']['slave']['flags'],
-            syslog: node['mesos']['slave']['syslog'])
+  variables(
+    env:    node['mesos']['slave']['env'],
+    bin:    node['mesos']['slave']['bin'],
+    flags:  node['mesos']['slave']['flags'],
+    syslog: node['mesos']['slave']['syslog'],
+    init:   node['mesos']['init']
+  )
 end
 
 # Mesos master service definition

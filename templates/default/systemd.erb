@@ -4,10 +4,11 @@ After=network.target
 Wants=network.target
 
 [Service]
+<%= @env.map { |k, v| "Environment='#{k}=\"#{v}\"'" }.join("\n")%>
 ExecStart=<%= @wrapper %>
 Restart=always
 RestartSec=20
-LimitNOFILE=16384
+LimitNOFILE=<%= @ulimit %>
 
 [Install]
 WantedBy=multi-user.target

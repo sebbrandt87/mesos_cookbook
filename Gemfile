@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 gem 'berkshelf'
 gem 'chefspec'
 gem 'foodcritic'
-gem 'rubocop'
+gem 'rubocop', '= 0.47.1'
 gem 'serverspec'
 
 gem 'chef', '= 12.14.60'

@@ -8,28 +8,36 @@ default['mesos']['repo']       = true
 default['mesos']['version']    = '1.1.0'
 
 # Init system to use
-default['mesos']['init']       = case node['platform']
-                                 when 'debian'
-                                   node['platform_version'].to_i >= 8 ? 'systemd' : 'sysvinit_debian'
-                                 when 'ubuntu'
-                                   node['platform_version'].to_f >= 15.04 ? 'systemd' : 'upstart'
-                                 when 'redhat', 'centos', 'scientific', 'oracle' # ~FC024
-                                   node['platform_version'].to_i >= 7 ? 'systemd' : 'upstart'
-                                 else 'upstart'
-                                 end
+default['mesos']['init'] = \
+  case node['platform']
+  when 'debian'
+    node['platform_version'].to_i >= 8 ? 'systemd' : 'sysvinit_debian'
+  when 'ubuntu'
+    node['platform_version'].to_f >= 15.04 ? 'systemd' : 'upstart'
+  when 'redhat', 'centos', 'scientific', 'oracle' # ~FC024
+    node['platform_version'].to_i >= 7 ? 'systemd' : 'upstart'
+  else
+    'upstart'
+  end
 
 #
 # Mesos MASTER configuration
 #
 
 # Mesos master binary location.
-default['mesos']['master']['bin']                   = '/usr/sbin/mesos-master'
+default['mesos']['master']['bin'] = '/usr/sbin/mesos-master'
 
 # Environmental variables set before calling the mesos master process.
-default['mesos']['master']['env']['ULIMIT']         = '-n 16384'
+default['mesos']['master']['env']['ULIMIT'] = \
+  case node['mesos']['init']
+  when 'systemd'
+    '16384'
+  else
+    '-n 16384'
+  end
 
 # Send stdout and stderr to syslog.
-default['mesos']['master']['syslog']                = true
+default['mesos']['master']['syslog']                 = true
 
 # Mesos master command line flags.
 # http://mesos.apache.org/documentation/latest/configuration/
@@ -44,10 +52,16 @@ default['mesos']['master']['flags']['work_dir']      = '/tmp/mesos'
 #
 
 # Mesos slave binary location.
-default['mesos']['slave']['bin']                    = '/usr/sbin/mesos-slave'
+default['mesos']['slave']['bin']                     = '/usr/sbin/mesos-slave'
 
 # Environmental variables set before calling the mesos-slave process.
-default['mesos']['slave']['env']['ULIMIT']          = '-n 16384'
+default['mesos']['slave']['env']['ULIMIT'] = \
+  case node['mesos']['init']
+  when 'systemd'
+    '16384'
+  else
+    '-n 16384'
+  end
 
 # Send stdout and stderr to syslog.
 default['mesos']['slave']['syslog']                 = true
@@ -64,11 +78,12 @@ default['mesos']['slave']['flags']['strict']        = true
 default['mesos']['slave']['flags']['recover']       = 'reconnect'
 
 # Workaround for setting default cgroups hierarchy root
-default['mesos']['slave']['flags']['cgroups_hierarchy'] = if node['mesos']['init'] == 'systemd'
-                                                            '/sys/fs/cgroup'
-                                                          else
-                                                            '/cgroup'
-                                                          end
+default['mesos']['slave']['flags']['cgroups_hierarchy'] = \
+  if node['mesos']['init'] == 'systemd'
+    '/sys/fs/cgroup'
+  else
+    '/cgroup'
+  end
 
 # Use the following options if you are using Exhibitor to manage Zookeeper
 # in your environment.

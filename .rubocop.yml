@@ -29,3 +29,9 @@ Metrics/LineLength:
   Enabled: false
 Style/ExtraSpacing:
   Enabled: false
+Metrics/ModuleLength:
+  Exclude:
+    - "**/*_spec.rb"
+Metrics/BlockLength:
+  Exclude:
+    - "**/*_spec.rb"
